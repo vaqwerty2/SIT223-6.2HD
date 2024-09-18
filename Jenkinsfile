@@ -5,7 +5,7 @@ pipeline {
         stage('Prepare') {
             steps {
                 script {
-                    // Remove existing Docker containers safely
+                    // Clean up any previously running containers
                     sh 'docker rm -f react-app-test || true'
                 }
             }
@@ -21,26 +21,26 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    // Run the Docker container
+                    // Run the React app in a Docker container
                     sh 'docker run --rm -d -p 3001:3000 --name react-app-test my-app-image'
-                    // Here, integrate your actual test commands or scripts
-                    sh 'echo "Run tests here"'
-                    // Optionally stop the Docker container if needed
+                    // Install Selenium WebDriver if necessary
+                    sh 'npm install selenium-webdriver'
+                    // Run the Selenium test
+                    sh 'node tests/selenium.test.js'
+                    // Optional: Stop the Docker container after tests
                     sh 'docker stop react-app-test'
                 }
             }
         }
     }
-
     post {
         always {
-            // Cleanup actions like archiving artifacts
-            archiveArtifacts artifacts: '**/target/*.jar', allowEmptyArchive: true
-            mail to: 'vidulattri2003@gmail.com', subject: 'Build Finished', body: "Check the build results in Jenkins."
-            // Ensure Docker containers are cleaned up properly
-            script {
-                sh 'docker rm -f react-app-test || true'
-            }
+            // Clean up
+            sh 'docker rm -f react-app-test || true'
+            // Archive artifacts and logs
+            archiveArtifacts artifacts: '**/build/**, **/logs/**', allowEmptyArchive: true
+            // Send email notification
+            mail to: 'vidulattri2003@gmail.com', subject: 'Jenkins Build Notification', body: 'Build completed. Check for details.'
         }
     }
 }
