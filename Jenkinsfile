@@ -16,9 +16,9 @@ pipeline {
                     docker.image('my-app-image').inside {
                         // Create a local npm cache directory within Jenkins workspace
                         sh 'mkdir -p $WORKSPACE/.npm'
-                        
-                        // Install dependencies without setting global npm config
-                        sh 'npm install'
+
+                        // Run npm install with a custom cache location
+                        sh 'npm install --cache=$WORKSPACE/.npm'
 
                         // Start the React app in the background
                         sh 'npm start &'
