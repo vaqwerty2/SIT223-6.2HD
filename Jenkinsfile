@@ -2,19 +2,20 @@ pipeline {
     agent any
 
     stages {
-        stage('Build') {
+        stage('Preparation') {
             steps {
                 script {
-                    docker.build('my-app-image')
+                    // Clean up previous Docker containers if they exist
+                    sh "docker rm -f react-app-test || true"
                 }
             }
         }
 
-        stage('Pre-Test Cleanup') {
+        stage('Build') {
             steps {
                 script {
-                    // Remove existing Docker container if it exists
-                    sh 'docker rm -f react-app-test || true'
+                    // Build Docker image from Dockerfile in the project directory
+                    sh "docker build -t my-app-image ."
                 }
             }
         }
@@ -22,23 +23,17 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    // Start the React app in Docker container
-                    sh 'docker run --rm -d -p 3001:3000 --name react-app-test my-app-image'
+                    // Run the application in a new Docker container
+                    sh "docker run --rm -d -p 3001:3000 --name react-app-test my-app-image"
 
-                    // Install Selenium WebDriver if not already in package.json
-                    sh 'npm install selenium-webdriver'
+                    // Install Selenium WebDriver if it's not included in package.json
+                    sh "npm install selenium-webdriver"
 
-                    // Run the Selenium test
-                    sh 'node tests/selenium.test.js'
-                }
-            }
-        }
+                    // Execute tests
+                    sh "node tests/selenium.test.js"
 
-        stage('Post-Test Cleanup') {
-            steps {
-                script {
-                    // Stop and remove the Docker container
-                    sh 'docker rm -f react-app-test || true'
+                    // Optionally, stop the Docker container after tests
+                    sh "docker stop react-app-test"
                 }
             }
         }
@@ -46,10 +41,21 @@ pipeline {
 
     post {
         always {
-            archiveArtifacts artifacts: '**/test-results.xml', allowEmptyArchive: true
-            emailext to: 'vidulattri2003@gmail.com',
-                     subject: 'Jenkins Build Completed',
-                     body: 'Check the Jenkins build results.'
+            // Archive test results and other artifacts
+            archiveArtifacts artifacts: '**/target/surefire-reports/*.xml', allowEmptyArchive: true
+
+            // Send an email notification regardless of the build result
+            emailext(
+                to: 'vidulattri2003@gmail.com',
+                subject: 'Jenkins Build Notification - ${BUILD_STATUS}',
+                body: """<p>Build Completed - ${BUILD_STATUS}: ${BUILD_URL}</p>"""
+            )
+        }
+        cleanup {
+            // Clean up the Docker container forcefully after the build is done
+            script {
+                sh "docker rm -f react-app-test || true"
+            }
         }
     }
 }

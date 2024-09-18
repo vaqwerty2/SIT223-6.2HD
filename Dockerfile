@@ -1,23 +1,35 @@
-# Use Node.js as the base image
-FROM node:18
+# Step 1: Build the React application
+# Using a Node.js base image to install dependencies and build the application
+FROM node:18 as builder
 
-# Set the working directory in the container
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy package.json and package-lock.json (or yarn.lock) to leverage Docker caching
 COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Change ownership of npm global directory to ensure it has correct permissions
-RUN mkdir -p /usr/local/etc/npmrc && chown -R node:node /usr/local/etc/npmrc
-
-# Copy the rest of the application
+# Copy the rest of the application code
 COPY . .
 
-# Expose port 3000
-EXPOSE 3000
+# Build the application for production
+RUN npm run build
 
-# Start the app
-CMD ["npm", "start"]
+# Step 2: Serve the application using Nginx
+# Using an Nginx base image to serve the built application
+FROM nginx:stable-alpine
+
+# Copy the build output from the previous stage
+COPY --from=builder /app/build /usr/share/nginx/html
+
+# Copy the Nginx configuration file (if you have one, else the default is used)
+# If you have a custom nginx.conf, uncomment the line below and add your nginx.conf in the project directory
+# COPY nginx.conf /etc/nginx/nginx.conf
+
+# Expose port 80 to the outside once the container has launched
+EXPOSE 80
+
+# Start Nginx and keep it running in the foreground
+CMD ["nginx", "-g", "daemon off;"]

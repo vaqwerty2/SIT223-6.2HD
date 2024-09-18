@@ -2,6 +2,9 @@
   "name": "jenkinshd",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -10,6 +13,10 @@
     "react-dom": "^18.3.1",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
+  },
+  "devDependencies": {
+    "chromedriver": "^128.0.3",
+    "selenium-webdriver": "^4.24.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -34,9 +41,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "chromedriver": "^128.0.3",
-    "selenium-webdriver": "^4.24.1"
   }
 }
