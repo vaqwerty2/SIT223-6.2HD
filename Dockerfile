@@ -10,6 +10,9 @@ COPY package*.json ./
 # Install the project dependencies
 RUN npm install
 
+# Ensure the working directory is accessible to Jenkins user
+RUN chown -R node:node /app
+
 # Copy the entire project into the container
 COPY . .
 
