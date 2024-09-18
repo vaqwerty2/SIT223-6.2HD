@@ -1,23 +1,26 @@
-# Start with a base image that includes Node.js
+# Use a specific version of node to avoid unexpected updates
 FROM node:14
 
-# Set the working directory in the Docker container to /app
+# Set a working directory
 WORKDIR /app
 
-# Set npm to use a custom cache directory (optional but helps with Docker caching)
+# Set npm to use a custom cache directory within the Docker container
 ENV NPM_CONFIG_CACHE=/app/.npm
 
-# Copy package.json and package-lock.json
+# Install global npm dependencies if any
+RUN npm install -g your-global-package
+
+# Copy package.json and package-lock.json first to leverage Docker cache
 COPY package*.json ./
 
-# Install dependencies
+# Install project dependencies
 RUN npm install
 
 # Copy the rest of the application
 COPY . .
 
-# Expose the port your React app will run on (default is 3000 for Create React App)
+# Expose the port your app runs on
 EXPOSE 3000
 
-# Command to run the app
+# Specify the command to run your app
 CMD ["npm", "start"]
