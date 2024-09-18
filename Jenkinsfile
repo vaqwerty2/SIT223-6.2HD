@@ -5,6 +5,7 @@ pipeline {
         stage('Build') {
             steps {
                 script {
+                    // Build the Docker image
                     docker.build('my-app-image')
                 }
             }
@@ -13,11 +14,12 @@ pipeline {
         stage('Test') {
             steps {
                 script {
+                    // Use Docker to run the container
                     docker.image('my-app-image').inside {
-                        // Ensure dependencies are installed
+                        // Optional: Set npm to use a custom cache directory within the workspace
+                        sh 'npm config set cache $WORKSPACE/.npm --global'
                         sh 'npm install'
-                        // Run Selenium tests
-                        sh 'node tests/selenium.test.js'
+                        // Run Selenium tests or other commands here
                     }
                 }
             }
