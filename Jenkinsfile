@@ -14,17 +14,16 @@ pipeline {
             steps {
                 script {
                     docker.image('my-app-image').inside {
-                        // Set npm cache directory to within the Jenkins workspace
+                        // Create a local npm cache directory within Jenkins workspace
                         sh 'mkdir -p $WORKSPACE/.npm'
-                        sh 'npm config set cache $WORKSPACE/.npm --global'
-
-                        // Run npm install using this cache
+                        
+                        // Install dependencies without setting global npm config
                         sh 'npm install'
 
-                        // Start the React app
+                        // Start the React app in the background
                         sh 'npm start &'
 
-                        // Run Selenium tests or other tests
+                        // Run Selenium or other tests
                         sh 'node tests/selenium.test.js'
                     }
                 }
