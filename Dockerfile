@@ -4,6 +4,9 @@ FROM node:14
 # Set the working directory in the Docker container to /app
 WORKDIR /app
 
+# Set npm to use a custom cache directory (optional but helps with Docker caching)
+ENV NPM_CONFIG_CACHE=/app/.npm
+
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
