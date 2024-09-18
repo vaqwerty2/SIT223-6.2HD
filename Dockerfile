@@ -1,26 +1,20 @@
 # Use a specific version of node to avoid unexpected updates
 FROM node:14
 
-# Set a working directory
+# Set the working directory in the Docker container
 WORKDIR /app
 
-# Set npm to use a custom cache directory within the Docker container
-ENV NPM_CONFIG_CACHE=/app/.npm
-
-# Install global npm dependencies if any
-RUN npm install -g your-global-package
-
-# Copy package.json and package-lock.json first to leverage Docker cache
+# Copy package.json and package-lock.json to leverage Docker caching
 COPY package*.json ./
 
 # Install project dependencies
 RUN npm install
 
-# Copy the rest of the application
+# Copy the rest of the application code
 COPY . .
 
-# Expose the port your app runs on
+# Expose the port the app runs on
 EXPOSE 3000
 
-# Specify the command to run your app
+# Command to run the app
 CMD ["npm", "start"]
