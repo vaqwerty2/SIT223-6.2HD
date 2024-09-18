@@ -28,8 +28,8 @@ COPY --from=builder /app/build /usr/share/nginx/html
 # If you have a custom nginx.conf, uncomment the line below and add your nginx.conf in the project directory
 # COPY nginx.conf /etc/nginx/nginx.conf
 
-# Expose port 80 to the outside once the container has launched
-EXPOSE 80
+# Expose port 3000 to the outside once the container has launched
+EXPOSE 3000
 
 # Start Nginx and keep it running in the foreground
 CMD ["nginx", "-g", "daemon off;"]
