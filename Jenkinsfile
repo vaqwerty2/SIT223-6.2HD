@@ -14,17 +14,17 @@ pipeline {
             steps {
                 script {
                     docker.image('my-app-image').inside {
-                        // Change ownership of the npm cache directory and use it within the workspace
+                        // Set npm cache directory to within the Jenkins workspace
                         sh 'mkdir -p $WORKSPACE/.npm'
                         sh 'npm config set cache $WORKSPACE/.npm --global'
 
-                        // Run npm install (ensure permissions are correct)
+                        // Run npm install using this cache
                         sh 'npm install'
 
                         // Start the React app
                         sh 'npm start &'
 
-                        // Run Selenium tests or any other tests
+                        // Run Selenium tests or other tests
                         sh 'node tests/selenium.test.js'
                     }
                 }

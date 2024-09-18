@@ -1,23 +1,23 @@
-# Use the Node.js 16 image as the base
+# Use Node.js as the base image
 FROM node:16
 
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the package.json and package-lock.json files to the working directory
+# Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Install the project dependencies
+# Install dependencies
 RUN npm install
 
-# Ensure the working directory is accessible to Jenkins user
-RUN chown -R node:node /app
+# Change ownership of npm global directory to ensure it has correct permissions
+RUN mkdir -p /usr/local/etc/npmrc && chown -R node:node /usr/local/etc/npmrc
 
-# Copy the entire project into the container
+# Copy the rest of the application
 COPY . .
 
-# Expose port 3000 for the React app (the app can be run on any port as specified in the Jenkinsfile)
+# Expose port 3000
 EXPOSE 3000
 
-# The default command to run the React app
+# Start the app
 CMD ["npm", "start"]
