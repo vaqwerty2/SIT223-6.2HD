@@ -16,10 +16,14 @@ pipeline {
                 script {
                     // Use Docker to run the container
                     docker.image('my-app-image').inside {
-                        // Optional: Set npm to use a custom cache directory within the workspace
+                        // Set npm to use a custom cache directory
                         sh 'npm config set cache $WORKSPACE/.npm --global'
+
+                        // Install the required npm dependencies
                         sh 'npm install'
-                        // Run Selenium tests or other commands here
+
+                        // Run the Selenium tests
+                        sh 'node tests/selenium.test.js'
                     }
                 }
             }
@@ -28,18 +32,12 @@ pipeline {
 
     post {
         always {
-            // Collect artifacts or logs if needed
-            // Assuming logs are saved in a known directory
-            archiveArtifacts artifacts: 'logs/**', fingerprint: true
-
-            // Send email notification with logs
+            // Archive artifacts and send notifications
+            archiveArtifacts artifacts: '**/test-results/*.xml', fingerprint: true
             emailext(
-              subject: "Build ${env.BUILD_NUMBER} Status",
-              body: """<p>Build ${env.BUILD_NUMBER} completed.</p>
-                       <p>Status: ${currentBuild.currentResult}</p>
-                       <p>See attached logs for more details.</p>""",
-              attachLog: true,
-              to: 'vidulattri2003@gmail.com'
+                to: 'vidulattri2003@gmail.com',
+                subject: "Build Status: ${currentBuild.fullDisplayName}",
+                body: "Build ${currentBuild.fullDisplayName} finished with status: ${currentBuild.currentResult}. Check details at: ${env.BUILD_URL}"
             )
         }
     }
