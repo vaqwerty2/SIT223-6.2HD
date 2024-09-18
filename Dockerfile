@@ -1,20 +1,20 @@
-# Use a specific version of Node.js
+# Use the Node.js 16 image as the base
 FROM node:16
 
-# Set the working directory
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json to leverage Docker cache
+# Copy the package.json and package-lock.json files to the working directory
 COPY package*.json ./
 
-# Install dependencies
+# Install the project dependencies
 RUN npm install
 
-# Copy the rest of the application
+# Copy the entire project into the container
 COPY . .
 
-# Expose the port that the React app will run on (3000 for Create React App)
+# Expose port 3000 for the React app (the app can be run on any port as specified in the Jenkinsfile)
 EXPOSE 3000
 
-# Command to start the React app
+# The default command to run the React app
 CMD ["npm", "start"]
