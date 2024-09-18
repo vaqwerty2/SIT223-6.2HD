@@ -34,5 +34,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "chromedriver": "^128.0.3",
+    "selenium-webdriver": "^4.24.1"
   }
 }
