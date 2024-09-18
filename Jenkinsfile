@@ -11,24 +11,22 @@ pipeline {
         }
 
         stage('Test') {
-            steps {
-                script {
-                    docker.image('my-app-image').inside {
-                        // Create a local npm cache directory within Jenkins workspace
-                        sh 'mkdir -p $WORKSPACE/.npm'
+    steps {
+        script {
+            // Start the React app in Docker container
+            sh 'docker run --rm -d -p 3001:3000 --name react-app-test my-app-image'
 
-                        // Run npm install with a custom cache location
-                        sh 'npm install --cache=$WORKSPACE/.npm'
+            // Install Selenium WebDriver if not already in package.json
+            sh 'npm install selenium-webdriver'
 
-                        // Start the React app in the background
-                        sh 'npm start &'
+            // Run the Selenium test
+            sh 'node tests/testApp.js'
 
-                        // Run Selenium or other tests
-                        sh 'node tests/selenium.test.js'
-                    }
-                }
-            }
+            // Optional: Stop the Docker container after tests
+            sh 'docker stop react-app-test'
         }
+    }
+}
     }
 
     post {
