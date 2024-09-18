@@ -20,7 +20,7 @@ pipeline {
             sh 'npm install selenium-webdriver'
 
             // Run the Selenium test
-            sh 'node tests/testApp.js'
+            sh 'node tests/selenium.test.js'
 
             // Optional: Stop the Docker container after tests
             sh 'docker stop react-app-test'
