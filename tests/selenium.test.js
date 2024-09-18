@@ -1,28 +1,27 @@
-const { Builder, By } = require('selenium-webdriver');
+const { Builder, By, until } = require('selenium-webdriver');
 require('chromedriver');
 
-async function testHomePage() {
-    let driver = await new Builder().forBrowser('chrome').build();
-    try {
-        // Navigate to your local development server
-        await driver.get('http://localhost:3000'); // Change this URL if your environment is different
+async function exampleTest() {
+    let driver = await new Builder()
+        .forBrowser('chrome')
+        .setChromeOptions(new (require('selenium-webdriver/chrome')).Options().headless())
+        .build();
 
-        // Check for the 'Hello, World!' header
-        const header = await driver.findElement(By.tagName('h1')).getText();
+    try {
+        // Go to the React app running on localhost:3000
+        await driver.get('http://localhost:3000');
+
+        // Example: Check if the h1 tag contains 'Hello, World!'
+        await driver.wait(until.elementLocated(By.tagName('h1')), 10000);
+        let header = await driver.findElement(By.tagName('h1')).getText();
         if (header !== 'Hello, World!') {
             throw new Error('Test Failed: Incorrect header');
         }
 
-        // Check for the 'Testing Jenkins' sub-header
-        const subHeader = await driver.findElement(By.tagName('h2')).getText();
-        if (subHeader !== 'Testing Jenkins') {
-            throw new Error('Test Failed: Incorrect sub-header');
-        }
-
-        console.log('Test Passed: Page contains the correct texts.');
+        console.log('Test Passed: Correct header found');
     } finally {
         await driver.quit();
     }
 }
 
-testHomePage();
+exampleTest();

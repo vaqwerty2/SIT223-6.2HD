@@ -14,15 +14,21 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    // Use Docker to run the container
+                    // Start the React app in the Docker container
                     docker.image('my-app-image').inside {
-                        // Set npm to use a custom cache directory
+                        // Set npm to use a custom cache directory within the workspace
                         sh 'npm config set cache $WORKSPACE/.npm --global'
-
-                        // Install the required npm dependencies
+                        
+                        // Install dependencies
                         sh 'npm install'
 
-                        // Run the Selenium tests
+                        // Start the React app in the background
+                        sh 'npm start &'
+
+                        // Wait for the app to be up (you may need to adjust the wait time)
+                        sleep 10
+
+                        // Run the Selenium tests against the running app
                         sh 'node tests/selenium.test.js'
                     }
                 }
