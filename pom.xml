@@ -13,6 +13,8 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <sonar.host.url>http://localhost:9000</sonar.host.url>
+        <sonar.login>sqp_bbb8770d9688fc5818203cb52c34fa78dec1d572</sonar.login>
     </properties>
 
     <!-- Dependencies can be added here -->

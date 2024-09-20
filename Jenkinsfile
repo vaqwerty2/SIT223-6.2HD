@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'my-react-app'
+        SONAR_TOKEN = credentials('sqp_bbb8770d9688fc5818203cb52c34fa78dec1d572')
     }
 
     tools {
@@ -45,7 +46,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('jenkinshd') { // Ensure 'SonarQube' is the correct configured name in Jenkins
-                    sh "mvn clean verify sonar:sonar -Dsonar.projectKey=jenkinshd -Dsonar.projectName='jenkinshd'"
+                    sh "mvn sonar:sonar -Dsonar.projectKey=jenkinshd -Dsonar.projectName=jenkinshd -Dsonar.host.url=http://localhost:9000 -Dsonar.login=${env.SONAR_TOKEN}"
                     // Ensure Maven command is correctly pointing to your project specifics and SonarQube configuration
                 }
             }
