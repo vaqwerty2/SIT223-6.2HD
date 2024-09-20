@@ -5,7 +5,7 @@ pipeline {
         DOCKER_IMAGE = 'my-react-app'
         SONAR_TOKEN = credentials('sqp_bbb8770d9688fc5818203cb52c34fa78dec1d572')
         OCTOPUS_CLI_SERVER_ID = 'https://jjenkinshd.octopus.app' // Use the Octopus server ID configured in Jenkins
-        OCTOPUS_PROJECT_NAME = 'jenkinshd' // Your Octopus project name
+        OCTOPUS_PROJECT_NAME = 'jenkins' // Your Octopus project name
         OCTOPUS_CLI_API_KEY = credentials('API-WQI9L08JU4WVYYNFJCOV9VSV2LONIH75') // Use the correct credentials ID for your Octopus API key
     }
 
