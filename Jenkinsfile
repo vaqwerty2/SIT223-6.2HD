@@ -20,15 +20,6 @@ pipeline {
             }
         }
 
-        stage('Push Image') {
-            steps {
-                script {
-                    docker.image(env.DOCKER_IMAGE).push("${env.BUILD_NUMBER}")
-                    docker.image(env.DOCKER_IMAGE).push("latest")
-                }
-            }
-        }
-
         stage('Deploy') {
             steps {
                 echo 'Deploying...'
