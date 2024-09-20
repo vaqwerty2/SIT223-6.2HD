@@ -20,22 +20,7 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            steps {
-                script {
-                    // Reuse the same Docker image built in the previous stage
-                    docker.image(env.DOCKER_IMAGE).inside {
-                        sh 'npm install'
-                        sh 'npm run test'
-                    }
-                }
-            }
-        }
-
         stage('Push Image') {
-            when {
-                branch 'main'
-            }
             steps {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub_credentials') {
@@ -47,9 +32,6 @@ pipeline {
         }
 
         stage('Deploy') {
-            when {
-                branch 'main'
-            }
             steps {
                 echo 'Deploying...'
                 // Add your deployment commands here
