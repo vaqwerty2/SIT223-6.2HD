@@ -4,9 +4,8 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'my-react-app'
         SONAR_TOKEN = credentials('sqp_bbb8770d9688fc5818203cb52c34fa78dec1d572')
-        OCTOPUS_CLI_SERVER_ID = 'https://jjenkinshd.octopus.app' // Use the Octopus server ID configured in Jenkins
-        OCTOPUS_PROJECT_NAME = 'jenkins' // Your Octopus project name
-        OCTOPUS_CLI_API_KEY = credentials('API-WQI9L08JU4WVYYNFJCOV9VSV2LONIH75') // Use the correct credentials ID for your Octopus API key
+        NETLIFY_AUTH_TOKEN = credentials('nfp_2xu4UB8Tq2Xrk2J1YGJVXCxyoizM62Pj724f')  // Use the Jenkins credentials ID that stores your Netlify token
+        SITE_ID = '7c3b9a75-b97e-4837-9ed0-f4f0860419d6'  // Your Netlify site ID
     }
 
     tools {
@@ -58,11 +57,15 @@ pipeline {
             }
         }
 
-        stage('Release') {
+        stage('Release to Netlify') {
             steps {
                 script {
-                    octopusCreateRelease additionalArgs: '--releaseNumber=${BUILD_NUMBER}', octopusDeployServerId: env.OCTOPUS_CLI_SERVER_ID, projectName: env.OCTOPUS_PROJECT_NAME
-                    octopusDeployRelease additionalArgs: '--deployTo=Production', octopusDeployServerId: env.OCTOPUS_CLI_SERVER_ID, projectName: env.OCTOPUS_PROJECT_NAME, releaseNumber: '${BUILD_NUMBER}'
+                    // Ensure Netlify CLI is installed or use API call
+                    sh """
+                    echo 'Deploying to Netlify...'
+                    npm run build
+                    npx netlify deploy --dir=./build --prod --auth=${NETLIFY_AUTH_TOKEN} --site=${SITE_ID}
+                    """
                 }
             }
         }
