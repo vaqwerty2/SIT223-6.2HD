@@ -6,7 +6,7 @@ pipeline {
         SONAR_TOKEN = credentials('sqp_bbb8770d9688fc5818203cb52c34fa78dec1d572')
         NETLIFY_AUTH_TOKEN = credentials('nfp_2xu4UB8Tq2Xrk2J1YGJVXCxyoizM62Pj724f')
         SITE_ID = '7c3b9a75-b97e-4837-9ed0-f4f0860419d6'
-        DATADOG_API_KEY = credentials('dcab34841849af57f9a8a66bfef7a717') // Jenkins credential ID for Datadog API key
+        DATADOG_API_KEY = credentials('dcab34841849af57f9a8a66bfef7a717')
     }
 
     tools {
@@ -73,7 +73,7 @@ pipeline {
                 script {
                     sh """
                     echo 'Sending data to Datadog...'
-                    curl -X POST -H "Content-type: application/json" -d '{
+                    curl -X POST -H 'Content-type: application/json' -d '{
                         "title": "Deployment completed for ${DOCKER_IMAGE}",
                         "text": "Deployment done at \$(date)",
                         "priority": "normal",
@@ -89,22 +89,31 @@ pipeline {
     post {
         always {
             echo 'Cleaning up...'
-            archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
         }
         success {
             emailext (
                 to: 'vidulattri2003@gmail.com',
                 subject: "SUCCESS: Build #${BUILD_NUMBER}",
-                body: "Hi,\n\nThe build was successful. Please find the attached log.",
-                attachmentsPattern: "**/build.log"
+                body: """Hi,
+
+The build was successful. Please find the attached log.
+Check the results here: ${env.BUILD_URL}
+
+Check the attached console log.""",
+                attachLog: true
             )
         }
         failure {
             emailext (
                 to: 'vidulattri2003@gmail.com',
                 subject: "FAILURE: Build #${BUILD_NUMBER}",
-                body: "Hi,\n\nThe build failed. Please find the attached log.",
-                attachmentsPattern: "**/build.log"
+                body: """Hi,
+
+The build failed. Please find the attached log.
+Check the results here: ${env.BUILD_URL}
+
+Check the attached console log.""",
+                attachLog: true
             )
         }
     }
