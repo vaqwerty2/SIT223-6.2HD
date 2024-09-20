@@ -22,9 +22,12 @@ pipeline {
 
         stage('Test') {
             steps {
-                echo 'Running tests...'
-                // Add your test commands here, for example:
-                sh 'npm run test' // This is an example for React apps using npm
+                script {
+                    docker.image(env.DOCKER_IMAGE).inside {
+                        sh 'npm install'
+                        sh 'npm run test'
+                    }
+                }
             }
         }
 
@@ -43,20 +46,19 @@ pipeline {
             steps {
                 echo 'Deploying...'
                 // Add your deployment commands here
-                // For example, using Docker Compose or Kubernetes commands
             }
         }
     }
 
     post {
+        always {
+            echo 'Cleaning up...'
+        }
         success {
             echo 'Pipeline completed successfully.'
         }
         failure {
             echo 'Pipeline failed.'
-        }
-        always {
-            echo 'Cleaning up...'
         }
     }
 }
