@@ -20,14 +20,19 @@ pipeline {
             }
         }
 
+        stage('Install Dependencies') {
+            steps {
+                echo 'Installing Node.js dependencies...'
+                sh 'npm install'
+            }
+        }
+
         stage('Test') {
             steps {
+                echo 'Running Selenium tests...'
                 script {
-                    echo 'Running tests...'
-                    docker.image(env.DOCKER_IMAGE).inside {
-                        sh 'npm install'
-                        sh 'npm run test'
-                    }
+                    // Assuming you have `chromedriver` and `selenium-webdriver` set up in the project
+                    sh 'node tests/selenium.test.js' // Run the Node.js Selenium test
                 }
             }
         }
@@ -35,7 +40,6 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying...'
-                // Add your deployment commands here
             }
         }
     }

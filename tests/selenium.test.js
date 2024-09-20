@@ -1,10 +1,16 @@
 const { Builder, By, until } = require('selenium-webdriver');
-require('chromedriver');
+const chrome = require('selenium-webdriver/chrome'); // Import chrome options
+require('chromedriver'); // Ensure chromedriver is required
 
 async function exampleTest() {
+    // Set Chrome options for headless mode
+    let chromeOptions = new chrome.Options();
+    chromeOptions.addArguments('headless'); // Use 'headless' argument for headless mode
+    chromeOptions.addArguments('disable-gpu'); // Recommended for headless mode
+
     let driver = await new Builder()
         .forBrowser('chrome')
-        .setChromeOptions(new (require('selenium-webdriver/chrome')).Options().headless())
+        .setChromeOptions(chromeOptions) // Apply the Chrome options
         .build();
 
     try {
