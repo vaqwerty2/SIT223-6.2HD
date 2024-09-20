@@ -1,5 +1,5 @@
-# Stage 1: Build the React application
-FROM node:18-alpine as build
+# Stage 1: Build the React application using the latest Node.js version
+FROM node:latest as build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm install
