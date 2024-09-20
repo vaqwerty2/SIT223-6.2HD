@@ -44,7 +44,7 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') { // Ensure 'SonarQube' is the correct configured name in Jenkins
+                withSonarQubeEnv('jenkinshd') { // Ensure 'SonarQube' is the correct configured name in Jenkins
                     sh "mvn clean verify sonar:sonar -Dsonar.projectKey=jenkinshd -Dsonar.projectName='jenkinshd'"
                     // Ensure Maven command is correctly pointing to your project specifics and SonarQube configuration
                 }
