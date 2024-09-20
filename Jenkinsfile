@@ -20,6 +20,18 @@ pipeline {
             }
         }
 
+        stage('Test') {
+            steps {
+                script {
+                    echo 'Running tests...'
+                    docker.image(env.DOCKER_IMAGE).inside {
+                        sh 'npm install'
+                        sh 'npm run test'
+                    }
+                }
+            }
+        }
+
         stage('Deploy') {
             steps {
                 echo 'Deploying...'
