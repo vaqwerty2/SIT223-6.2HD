@@ -23,14 +23,12 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Running tests...'
-                // Add commands to run your tests here
+                // Add your test commands here, for example:
+                sh 'npm run test' // This is an example for React apps using npm
             }
         }
 
         stage('Push Image') {
-            when {
-                branch 'main'
-            }
             steps {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub_credentials') {
@@ -42,13 +40,23 @@ pipeline {
         }
 
         stage('Deploy') {
-            when {
-                branch 'main'
-            }
             steps {
                 echo 'Deploying...'
-                // Add your deployment scripts here
+                // Add your deployment commands here
+                // For example, using Docker Compose or Kubernetes commands
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully.'
+        }
+        failure {
+            echo 'Pipeline failed.'
+        }
+        always {
+            echo 'Cleaning up...'
         }
     }
 }
