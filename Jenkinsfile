@@ -32,6 +32,9 @@ pipeline {
         }
 
         stage('Push Image') {
+            when {
+                branch 'main'
+            }
             steps {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub_credentials') {
@@ -43,6 +46,9 @@ pipeline {
         }
 
         stage('Deploy') {
+            when {
+                branch 'main'
+            }
             steps {
                 echo 'Deploying...'
                 // Add your deployment commands here
