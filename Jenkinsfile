@@ -23,6 +23,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
+                    // Reuse the same Docker image built in the previous stage
                     docker.image(env.DOCKER_IMAGE).inside {
                         sh 'npm install'
                         sh 'npm run test'
