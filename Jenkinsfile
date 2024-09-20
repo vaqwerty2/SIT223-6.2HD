@@ -5,6 +5,11 @@ pipeline {
         DOCKER_IMAGE = 'my-react-app'
     }
 
+    tools {
+        // Ensure your Maven or any other required tool is configured here if needed for SonarQube or other stages
+        maven 'M3' // Example placeholder for Maven, ensure it matches Jenkins configuration
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -31,8 +36,17 @@ pipeline {
             steps {
                 echo 'Running Selenium tests...'
                 script {
-                    // Assuming you have `chromedriver` and `selenium-webdriver` set up in the project
+                    // Ensure that Node.js environment has all dependencies such as chromedriver and selenium-webdriver
                     sh 'node tests/selenium.test.js' // Run the Node.js Selenium test
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') { // Ensure 'SonarQube' is the correct configured name in Jenkins
+                    sh "mvn clean verify sonar:sonar -Dsonar.projectKey=jenkinshd -Dsonar.projectName='jenkinshd'"
+                    // Ensure Maven command is correctly pointing to your project specifics and SonarQube configuration
                 }
             }
         }
@@ -40,6 +54,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying...'
+                // Additional deployment steps go here
             }
         }
     }
