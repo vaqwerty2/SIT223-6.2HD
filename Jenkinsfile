@@ -1,51 +1,54 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_IMAGE = 'my-react-app'
+    }
+
     stages {
-        stage('Prepare') {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build Docker Image') {
             steps {
                 script {
-                    // Attempt to remove the existing Docker container if it exists
-                    sh 'docker rm -f react-app-test || true'
-                    // Clean npm cache forcefully
-                    sh 'npm cache clean --force'
+                    docker.build(env.DOCKER_IMAGE)
                 }
             }
         }
-        stage('Build') {
+
+        stage('Test') {
+            steps {
+                echo 'Running tests...'
+                // Add commands to run your tests here
+            }
+        }
+
+        stage('Push Image') {
+            when {
+                branch 'main'
+            }
             steps {
                 script {
-                    // Remove existing node_modules and package-lock.json
-                    sh 'rm -rf node_modules package-lock.json'
-                    // Docker build with no cache to ensure fresh layers
-                    sh 'docker build --no-cache -t my-app-image .'
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub_credentials') {
+                        docker.image(env.DOCKER_IMAGE).push("${env.BUILD_NUMBER}")
+                        docker.image(env.DOCKER_IMAGE).push("latest")
+                    }
                 }
             }
         }
-    //     stage('Test') {
-    //         steps {
-    //             script {
-    //                 // Run the Docker container
-    //                 sh 'docker run --rm -d -p 3001:3000 --name react-app-test my-app-image'
-    //                 // Install npm dependencies and run tests
-    //                 sh '''
-    //                 npm install
-    //                 node tests/selenium.test.js
-    //                 '''
-    //                 // Stop and remove the Docker container
-    //                 sh 'docker stop react-app-test'
-    //             }
-    //         }
-    //     }
-    // }
-    // post {
-    //     always {
-    //         // Clean up Docker container regardless of build success or failure
-    //         sh 'docker rm -f react-app-test || true'
-    //         // Archive artifacts
-    //         archiveArtifacts artifacts: '**/build/**, **/logs/**', allowEmptyArchive: true
-    //         // Send a build notification email
-    //         mail to: 'vidulattri2003@gmail.com', subject: 'Jenkins Build Notification', body: 'The build has been completed. Please check the details.'
-    //     }
+
+        stage('Deploy') {
+            when {
+                branch 'main'
+            }
+            steps {
+                echo 'Deploying...'
+                // Add your deployment scripts here
+            }
+        }
     }
 }
