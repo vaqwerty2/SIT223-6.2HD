@@ -4,12 +4,13 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'my-react-app'
         SONAR_TOKEN = credentials('sqp_bbb8770d9688fc5818203cb52c34fa78dec1d572')
-        NETLIFY_AUTH_TOKEN = credentials('nfp_2xu4UB8Tq2Xrk2J1YGJVXCxyoizM62Pj724f')  // Use the Jenkins credentials ID that stores your Netlify token
-        SITE_ID = '7c3b9a75-b97e-4837-9ed0-f4f0860419d6'  // Your Netlify site ID
+        NETLIFY_AUTH_TOKEN = credentials('nfp_2xu4UB8Tq2Xrk2J1YGJVXCxyoizM62Pj724f')
+        SITE_ID = '7c3b9a75-b97e-4837-9ed0-f4f0860419d6'
+        DATADOG_API_KEY = credentials('dcab34841849af57f9a8a66bfef7a717') // Jenkins credential ID for Datadog API key
     }
 
     tools {
-        maven 'M3' // Ensure Maven is installed
+        maven 'M3'
     }
 
     stages {
@@ -52,19 +53,33 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying with Docker Compose...'
-                sh 'docker-compose down'  // Stop any running containers
-                sh 'docker-compose up -d' // Start the containers in detached mode
+                sh 'docker-compose down'
+                sh 'docker-compose up -d'
             }
         }
 
         stage('Release to Netlify') {
             steps {
                 script {
-                    // Ensure Netlify CLI is installed or use API call
-                    sh """
                     echo 'Deploying to Netlify...'
-                    npm run build
-                    npx netlify deploy --dir=./build --prod --auth=${NETLIFY_AUTH_TOKEN} --site=${SITE_ID}
+                    sh "npm run build"
+                    sh "npx netlify deploy --dir=./build --prod --auth=${NETLIFY_AUTH_TOKEN} --site=${SITE_ID}"
+                }
+            }
+        }
+
+        stage('Monitor with Datadog') {
+            steps {
+                script {
+                    sh """
+                    echo 'Sending data to Datadog...'
+                    curl -X POST -H "Content-type: application/json" -d '{
+                        "title": "Deployment completed for ${DOCKER_IMAGE}",
+                        "text": "Deployment done at \$(date)",
+                        "priority": "normal",
+                        "tags": ["environment:production", "project:jenkinshd"],
+                        "alert_type": "info"
+                    }' 'https://api.datadoghq.com/api/v1/events?api_key=${DATADOG_API_KEY}'
                     """
                 }
             }
