@@ -47,5 +47,5 @@ pipeline {
     //         // Send a build notification email
     //         mail to: 'vidulattri2003@gmail.com', subject: 'Jenkins Build Notification', body: 'The build has been completed. Please check the details.'
     //     }
-    // }
+    }
 }
