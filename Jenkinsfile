@@ -89,12 +89,23 @@ pipeline {
     post {
         always {
             echo 'Cleaning up...'
+            archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
         }
         success {
-            echo 'Pipeline completed successfully.'
+            emailext (
+                to: 'vidulattri2003@gmail.com',
+                subject: "SUCCESS: Build #${BUILD_NUMBER}",
+                body: "Hi,\n\nThe build was successful. Please find the attached log.",
+                attachmentsPattern: "**/build.log"
+            )
         }
         failure {
-            echo 'Pipeline failed.'
+            emailext (
+                to: 'vidulattri2003@gmail.com',
+                subject: "FAILURE: Build #${BUILD_NUMBER}",
+                body: "Hi,\n\nThe build failed. Please find the attached log.",
+                attachmentsPattern: "**/build.log"
+            )
         }
     }
 }
